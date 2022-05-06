@@ -3,7 +3,10 @@ const UserController=require("../controllers/userController.js")
 const passport = require('../Authentication/googleLogin');
 const userModel = require('../model/userSchema');
 const JWTService = require('../CommonLib/JWTtoken');
-const encryptDecrypt = require('../CommonLib/encryption-decryption')
+const encryptDecrypt = require('../CommonLib/encryption-decryption');
+const facebookAuth = require("../Authentication/faceauth");
+
+router.use('/auth', facebookAuth)
 
 router.get("/userdata")
 router.post('/user', UserController.createUser);
@@ -74,11 +77,11 @@ async function (req, res) {
             let lastUser = await userModel.find({}).sort({ id : -1}).limit(1);
             let encrptedPassword = encryptDecrypt.encryptPassword("kajjajbhjvqnjq@123$$$$");
              let userDetailObj ={
-                firstName : req.user.given_name,
-                lastName : req.user.family_name,
+                firstName : req.user._json.given_name,
+                lastName : req.user._json.family_name,
                 age:-1,
                 phoneNo:-1,
-                email,
+                email:req.user._json.email,
                 gender:"NA",
                 password:encrptedPassword,
                 id:lastUser[0].id + 1
@@ -98,6 +101,22 @@ async function (req, res) {
 
     }
     );
+
+
+
+
+
+
+
+//This endpoint connects the User to Facebook
+router.get('/auth/facebook', passport.authenticate('facebook'));
+
+//This endpoint is the Facebook Callback URL and on success or failure returns a response to the app
+router.get('/callback', passport.authenticate('facebook', {          
+            failureRedirect: '/login' }), (req, res) => {
+                    //  res.redirect('/user/home');
+                    res.send("successfully login")
+});
 
 
 router.post("/login",UserController.login)

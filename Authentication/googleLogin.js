@@ -16,11 +16,11 @@ passport.use(new GoogleStrategy({
         passReqToCallback   : true
     },
     function(request, accessToken, refreshToken, profile, done) {
-            console.log("accessToken", accessToken)
-            console.log("refreshToken", refreshToken)
-            console.log("profileData", profile)
+        //     console.log("accessToken", accessToken)
+        //     console.log("refreshToken", refreshToken)
+             console.log("profileData", profile)
             return done(null, profile);
     }
-));
+))
 
 module.exports = passport;
